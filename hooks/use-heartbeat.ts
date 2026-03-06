@@ -7,6 +7,7 @@ const useHeartbeat = () => {
   const isActiveRef = useRef(true);
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_ENABLE_HEARTBEAT !== "true") return;
     if (!session?.user?.id) return;
 
     const sendHeartbeat = async () => {
