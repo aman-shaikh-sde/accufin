@@ -27,6 +27,8 @@ const LoadingSpinner = () => (
   <span className="h-4 w-4 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
 );
 
+const SIGN_IN_TIMEOUT_MS = 15000;
+
 function LoginForm() {
   const [showTerms, setShowTerms] = useState(false);
   const [email, setEmail] = useState("");
@@ -60,14 +62,22 @@ function LoginForm() {
 
     setLoading(true);
     try {
-      const res = await signIn("credentials", {
+      const signInPromise = signIn("credentials", {
         redirect: false,
         email,
         password,
       });
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error("Sign-in request timed out. Please try again."));
+        }, SIGN_IN_TIMEOUT_MS);
+      });
+      const res = await Promise.race([signInPromise, timeoutPromise]);
 
       if (res?.error) {
         toast.error(res.error);
+      } else if (!res || !("ok" in res) || !res.ok) {
+        toast.error("Unable to sign in right now. Please try again.");
       } else {
         toast.success("Login successful!");
         router.push("/dashboard");

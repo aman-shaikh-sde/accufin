@@ -67,6 +67,17 @@ function createUserReturnObject(user: any) {
 
 // Handle MFA verification
 
+const AUTH_DB_TIMEOUT_MS = 10000;
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+    }),
+  ]);
+}
+
 export const authOptions: AuthOptions = {
   providers: [
     Credentials({
@@ -83,9 +94,10 @@ export const authOptions: AuthOptions = {
           throw new Error("Please enter both email and password");
         }
 
-        const user = await validateUserCredentials(
-          credentials.email,
-          credentials.password
+        const user = await withTimeout(
+          validateUserCredentials(credentials.email, credentials.password),
+          AUTH_DB_TIMEOUT_MS,
+          "Authentication is taking too long. Please try again."
         );
 
 
@@ -131,12 +143,12 @@ export const authOptions: AuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 15 * 60, // 15 minutes in seconds
-    updateAge: 5 * 60, // refresh token every 5 minutes of activity
+    maxAge: 8 * 60 * 60, // 8 hours in seconds
+    updateAge: 30 * 60, // refresh token every 30 minutes of activity
   },
   jwt: {
-    maxAge: 15 * 60, // 15 minutes in seconds
+    maxAge: 8 * 60 * 60, // 8 hours in seconds
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true, // Enable debug mode for AWS logs
+  debug: process.env.NODE_ENV !== "production",
 };
