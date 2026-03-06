@@ -88,8 +88,8 @@ export const authOptions: AuthOptions = {
         otp: { label: "OTP", type: "text" },
         otpVerified: { label: "OTP Verified", type: "text" },
       },
-      async authorize(credentials) {
-        //login
+            async authorize(credentials) {
+        console.log("authorize:start", credentials?.email);
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Please enter both email and password");
         }
@@ -100,9 +100,7 @@ export const authOptions: AuthOptions = {
           "Authentication is taking too long. Please try again."
         );
 
-
-
-        // If all verifications pass, proceed with login
+        console.log("authorize:success", credentials.email);
         return createUserReturnObject(user);
       },
     }),

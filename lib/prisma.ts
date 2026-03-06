@@ -1,6 +1,4 @@
 import { PrismaClient } from "./generated/prisma";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
 
 const globalAny = globalThis as any;
 if (!globalAny.__accufinGuardsInstalled) {
@@ -10,15 +8,9 @@ if (!globalAny.__accufinGuardsInstalled) {
 }
 
 const prismaClientSingleton = () => {
-  const connectionString = process.env.DATABASE_URL!;
-  const pool = new Pool({ connectionString, max: 10, idleTimeoutMillis: 30000 });
-  const adapter = new PrismaPg(pool);
-
   const client = new PrismaClient({
-    adapter,
     log: ["error", "warn"],
   });
-
   return client;
 };
 
