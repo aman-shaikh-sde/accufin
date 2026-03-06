@@ -1,4 +1,3 @@
-import "./net-debug";
 import { PrismaClient } from "./generated/prisma";
 import { PrismaNeonHTTP } from "@prisma/adapter-neon";
 
