@@ -467,7 +467,7 @@ export async function POST(request: NextRequest) {
     });
     const existingNames = new Set(
       existingFiles
-        .map((f) => f.name)
+        .map((f: { name: string | null }) => f.name)
         .filter((name): name is string => typeof name === "string" && name.length > 0)
     );
 
