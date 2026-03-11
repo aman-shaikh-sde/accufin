@@ -27,7 +27,7 @@ const LoadingSpinner = () => (
   <span className="h-4 w-4 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
 );
 
-const SIGN_IN_TIMEOUT_MS = 15000;
+const SIGN_IN_TIMEOUT_MS = 60000;
 
 function LoginForm() {
   const [showTerms, setShowTerms] = useState(false);

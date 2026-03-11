@@ -6,17 +6,17 @@ export default withAuth(
     return NextResponse.next();
   },
   {
+    pages: {
+      signIn: "/login",
+    },
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token }) => {
+        return !!token;
+      },
     },
   }
 );
 
 export const config = {
-  matcher: [
-    // Protected routes that require authentication
-    "/dashboard",
-    
-    
-  ],
+  matcher: ["/dashboard"],
 };

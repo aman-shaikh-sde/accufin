@@ -1,11 +1,15 @@
 import { PrismaClient } from "./generated/prisma";
+import { PrismaNeon } from "@prisma/adapter-neon";
 
 const globalAny = globalThis as any;
 
 if (!globalAny.__accufinPrisma) {
-  process.on("uncaughtException", (err) => console.error("uncaughtException:", err));
-  process.on("unhandledRejection", (err) => console.error("unhandledRejection:", err));
+  const adapter = new PrismaNeon({ 
+    connectionString: process.env.DATABASE_URL! 
+  });
+  
   globalAny.__accufinPrisma = new PrismaClient({
+    adapter,
     log: ["error", "warn"],
   });
 }
