@@ -3,35 +3,25 @@ import { compare } from "bcryptjs";
 import { AuthOptions } from "next-auth";
 import prisma from "./prisma";
 
-async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Database query timed out")), ms)
-  );
-  return Promise.race([promise, timeout]);
-}
-
 async function validateUserCredentials(email: string, password: string) {
   const cleanEmail = email.toLowerCase().trim();
 
-  const user = await withTimeout(
-    prisma.user.findFirst({
-      where: {
-        email: {
-          equals: cleanEmail,
-          mode: "insensitive",
-        },
+  const user = await prisma.user.findFirst({
+    where: {
+      email: {
+        equals: cleanEmail,
+        mode: "insensitive",
       },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        isAdmin: true,
-        isActive: true,
-        password: true,
-      },
-    }),
-    15000
-  );
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      isAdmin: true,
+      isActive: true,
+      password: true,
+    },
+  });
 
   if (!user) {
     throw new Error("No account found with this email");
