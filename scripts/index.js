@@ -36,7 +36,10 @@ function msUntilNextTrigger(hours, minutes) {
 }
 
 async function trigger(path) {
-  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const baseUrl =
+    process.env.NEXTAUTH_URL_INTERNAL ||
+    process.env.NEXTAUTH_URL ||
+    "http://localhost:3000";
   const url = `${baseUrl}${path}`;
   const adminSecret = process.env.ADMIN_SECRET;
 
@@ -55,10 +58,47 @@ async function trigger(path) {
     console.log(
       `[cron] Calling ${url} with admin secret: ${adminSecret.slice(0, 2)}***`
     );
+    // #region agent log
+    fetch('http://127.0.0.1:7876/ingest/0584b70e-2691-44ec-aa92-759daa294baa',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Debug-Session-Id':'8ce4db'
+      },
+      body:JSON.stringify({
+        sessionId:'8ce4db',
+        runId:'pre-fix',
+        hypothesisId:'H1',
+        location:'scripts/index.js:trigger:beforeFetch',
+        message:'Cron trigger about to call URL',
+        data:{ url, path },
+        timestamp:Date.now()
+      })
+    }).catch(()=>{});
+    // #endregion
+
     const res = await fetch(url, { method: "POST", headers });
     const text = await res.text();
     console.log(`[cron] POST ${path} ->`, res.status, text);
   } catch (err) {
+    // #region agent log
+    fetch('http://127.0.0.1:7876/ingest/0584b70e-2691-44ec-aa92-759daa294baa',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Debug-Session-Id':'8ce4db'
+      },
+      body:JSON.stringify({
+        sessionId:'8ce4db',
+        runId:'pre-fix',
+        hypothesisId:'H1',
+        location:'scripts/index.js:trigger:catch',
+        message:'Cron trigger fetch failed',
+        data:{ url, path, errorMessage: String(err && err.message), errorCode: err && err.code },
+        timestamp:Date.now()
+      })
+    }).catch(()=>{});
+    // #endregion
     console.error(`[cron] POST ${path} failed:`, err);
   }
 }

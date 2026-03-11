@@ -35,7 +35,10 @@ export async function POST(request: Request) {
 
     for (const user of users) {
       try {
-        const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+        const baseUrl =
+          process.env.NEXTAUTH_URL_INTERNAL ||
+          process.env.NEXTAUTH_URL ||
+          "http://localhost:3000";
         const res = await fetch(
           `${baseUrl}/api/admin/users/${user.id}/delete`,
           {
