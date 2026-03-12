@@ -1,18 +1,22 @@
+// app/dashboard/page.tsx
+
 "use client";
 
-import type React from "react";
 import { Suspense } from "react";
 import { useSession } from "next-auth/react";
 import AdminDashboard from "./_components/admin/AdminDashboard";
 import UserDashboard from "./_components/user/UserDashboard";
 
-export default function LoginPage() {
-  const { data: session } = useSession();
-  const user = session?.user;
+export default function DashboardPage() {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <div className="min-h-screen bg-cyan-50" />;
+  }
 
   return (
     <Suspense fallback={<div className="min-h-screen bg-cyan-50" />}>
-      {user?.isAdmin ? <AdminDashboard /> : <UserDashboard />}
+      {session?.user?.isAdmin ? <AdminDashboard /> : <UserDashboard />}
     </Suspense>
   );
 }

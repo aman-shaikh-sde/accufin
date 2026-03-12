@@ -1,12 +1,20 @@
+// lib/prisma.ts
+
 import { PrismaClient } from "./generated/prisma";
 
-const globalAny = globalThis as any;
+const PRISMA_KEY = Symbol.for("accufin.prisma");
 
-if (!globalAny.__accufinPrisma) {
-  globalAny.__accufinPrisma = new PrismaClient({
-    log: ["error", "warn"],
+type GlobalWithPrisma = typeof globalThis & {
+  [PRISMA_KEY]?: PrismaClient;
+};
+
+const g = globalThis as GlobalWithPrisma;
+
+if (!g[PRISMA_KEY]) {
+  g[PRISMA_KEY] = new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
 }
 
-export const prisma = globalAny.__accufinPrisma as PrismaClient;
+export const prisma = g[PRISMA_KEY] as PrismaClient;
 export default prisma;

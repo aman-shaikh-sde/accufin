@@ -1,30 +1,31 @@
-import 'next-auth';
-import { JWT } from 'next-auth/jwt';
+// types/next-auth.d.ts
 
-declare module 'next-auth' {
-    interface User {
-        id: string;
-        email: string;
-        name: string | null;
-        isAdmin: boolean;
-         isActive: boolean;
-    }
+import "next-auth";
+import "next-auth/jwt";
 
-    interface Session {
-        user: {
-            id: string;
-            email: string;
-            name: string | null;
-            isAdmin: boolean;
-        };
-    }
+declare module "next-auth" {
+  interface User {
+    id: string;
+    isAdmin: boolean;
+    isActive: boolean;
+  }
+
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name: string;
+      isAdmin: boolean;
+      isActive: boolean;
+    };
+  }
 }
 
-declare module 'next-auth/jwt' {
-    interface JWT {
-        id: string;
-        email: string;
-        name: string | null;
-        isAdmin: boolean;
-    }
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    isAdmin: boolean;
+    isActive: boolean;
+    iat: number;
+  }
 }

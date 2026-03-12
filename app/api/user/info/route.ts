@@ -45,8 +45,13 @@ export async function GET() {
           signedUrl = signedUrl.replace('=s96-c', '=s200');
         }
       } else if (user.profileUrl.startsWith('https://')) {
-        // For other HTTPS URLs, use directly (could be other OAuth providers)
-        signedUrl = user.profileUrl;
+        // For other HTTPS URLs, validate and use directly (could be other OAuth providers)
+        const cleanedUrl = user.profileUrl.trim();
+        // Reject obviously malformed HTTPS URLs (e.g. spaces in host)
+        if (cleanedUrl.includes(" ")) {
+          throw new Error("Invalid profile URL: contains whitespace");
+        }
+        signedUrl = cleanedUrl;
       } else {
         // For S3 paths, generate signed URL
         signedUrl = await getSignedUrlFromPath(user.profileUrl);

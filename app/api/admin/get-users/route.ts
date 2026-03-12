@@ -83,8 +83,13 @@ async function addSignedUrlsToUsers(users: any[]): Promise<any[]> {
             }
             return { ...user, profileImageUrl: googleUrl };
           } else if (user.profileUrl.startsWith('https://')) {
-            // For other HTTPS URLs, use directly (could be other OAuth providers)
-            return { ...user, profileImageUrl: user.profileUrl };
+            // For other HTTPS URLs, validate and use directly (could be other OAuth providers)
+            const cleanedUrl = user.profileUrl.trim();
+            // Reject obviously malformed HTTPS URLs (e.g. spaces in host)
+            if (cleanedUrl.includes(" ")) {
+              throw new Error("Invalid profile URL: contains whitespace");
+            }
+            return { ...user, profileImageUrl: cleanedUrl };
           } else {
             // For S3 paths, generate signed URL
             const signedUrl = await getSignedUrlFromPath(user.profileUrl);
