@@ -154,6 +154,10 @@ export const authOptions: AuthOptions = {
     },
   },
 
+  events: {
+    async signOut() {},
+  },
+
   pages: {
     signIn: "/login",
     error: "/login",
@@ -171,5 +175,5 @@ export const authOptions: AuthOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true,
-  debug: process.env.NODE_ENV !== "production",
+  debug: false,
 };
